@@ -27,3 +27,63 @@ Create a new project using the template in Android Studio:
 10. In the **Design** view, you will see a blank pane with this text: ⚠️ A successful build is needed before the preview can be displayed. **Build & Refresh...**
 11. Click **Build & Refresh**. It may take a while to build but when it is done the preview shows a text box that says "**Hello Android!**". Empty Compose activity contains all the code necessary to create this app.
 12. Select **app** from run configuration drop-down list and click the **Run** button. It may take a while to build your app and install on connected emulator or android device. When it is done the Notes app will be launched and displayed.
+
+## Set up CI to run local tests
+
+Create a new Github Actions workflow to run local tests on all modules of the project:
+1. In the Android Studio, click **View > Tool Windows > Project**
+2. Select **Project** from drop-down list in the **Project** window on the left side of the Android Studio
+3. Create `.github/workflows` directory in the root of Notes app
+4. Create a new file `CI.yml` in `.github/workflows` to define CI workflow running local tests
+
+📄 .github/workflows/CI.yml
+```diff
++name: Run local tests
++
++on:
++  # Trigger the workflow manually using the Actions tab on GitHub, GitHub CLI, or the REST API
++  workflow_dispatch:
++  # Trigger the workflow on Push event to main branch
++  push:
++    branches: [ main ]
++  # Trigger the workflow on Pull Request event. By default, a workflow only runs
++  # when a Pull Request event's activity type is opened, synchronize or reopened.
++  pull_request:
++    types: [ opened, synchronize, reopened ]
++
++# Cancel any current or previous job from the same Pull Request
++concurrency:
++  group: ${{ github.workflow }}-${{ github.ref }}
++  cancel-in-progress: true
++
++jobs:
++  local-tests:
++    name: Run Local Tests
++    runs-on: ubuntu-latest
++    timeout-minutes: 10
++    continue-on-error: false
++
++    steps:
++      - name: Checkout repository
++        uses: actions/checkout@v3
++
++      - name: Validate Gradle wrapper
++        uses: gradle/wrapper-validation-action@v1
++
++      - name: Set up JDK 11
++        uses: actions/setup-java@v3
++        with:
++          distribution: 'zulu'
++          java-version: '11'
++          cache: 'gradle'
++
++      - name: Run local tests
++        run: ./gradlew testDebug --no-daemon
++
++      - name: Upload build reports
++        if: always()
++        uses: actions/upload-artifact@v3
++        with:
++          name: build-reports
++          path: ./**/build/reports/tests/
+```
