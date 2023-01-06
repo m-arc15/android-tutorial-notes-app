@@ -1,15 +1,14 @@
 name: CI
 
 on:
-  # Trigger the workflow manually using the Actions tab on GitHub, GitHub CLI, or the REST API
   workflow_dispatch:
-  # Trigger the workflow on Push event to main branch
   push:
     branches: [ main ]
-  # Trigger the workflow on Pull Request event. By default, a workflow only runs
-  # when a Pull Request event's activity type is opened, synchronize or reopened.
+    paths-ignore:
+      - 'README.md'
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    paths-ignore:
+      - 'README.md'
 
 env:
   CACHE_VERSION: 1 # Increment this to invalidate the cache.
@@ -22,7 +21,7 @@ concurrency:
 
 jobs:
   local-tests:
-    name: Check Local Tests
+    name: Check local tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: false
@@ -48,18 +47,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: local-tests-reports
+          name: local-tests-report
           path: ./**/build/reports/tests/
 
   android-tests:
-    name: Check Android Tests
+    name: Check android tests
     runs-on: macOS-latest
     timeout-minutes: 10
     continue-on-error: false
     strategy:
       fail-fast: true
       matrix:
-        api-level: [ 33 ]
+        api-level: [ 31 ]
 
     steps:
       - name: Checkout repository
@@ -103,7 +102,7 @@ jobs:
           force-avd-creation: false
           ram-size: 4096M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: echo "Generated AVD snapshot."
+          script: echo "Generated AVD snapshot for caching."
 
       - name: Run android tests (real device or emulator)
         uses: reactivecircus/android-emulator-runner@v2
@@ -121,5 +120,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: android-tests-reports
-          path: ./**/build/reports/ui-tests/
+          name: android-tests-report
+          path: ./**/build/reports/androidTests/
