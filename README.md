@@ -243,4 +243,75 @@ Which TDD style is best for us?
 - The true value of tests is tracking down and correcting defects
 - Outside-in starting with failing Acceptance Test, resolved with multiple Red > Green > Refactor cycles
 
+## Set up project to let you test Compose code
+
+First, add the following dependencies to the `build.gradle` file of the module containing your UI tests:
+
+```groovy
++    // Test rules and transitive dependencies:
++    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
++    // Needed for createAndroidComposeRule, but not createComposeRule:
++    debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
+```
+
+Then extract Compose code for Main Screen content to composable function:
+```diff
+@@ -16,15 +16,20 @@ class MainActivity : ComponentActivity() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         setContent {
+-            NotesTheme {
+-                // A surface container using the 'background' color from the theme
+-                Surface(
+-                    modifier = Modifier.fillMaxSize(),
+-                    color = MaterialTheme.colorScheme.background
+-                ) {
+-                    Greeting("Android")
+-                }
+-            }
++            MainScreen()
++        }
++    }
++}
++
++@Composable
++fun MainScreen() {
++    NotesTheme {
++        // A surface container using the 'background' color from the theme
++        Surface(
++            modifier = Modifier.fillMaxSize(),
++            color = MaterialTheme.colorScheme.background
++        ) {
++            Greeting("Android")
+         }
+     }
+ }
+```
+
+Then create initial UI test for MainActivity:
+
+📄 app/src/androidTest/java/com/package/MainActivityTest.kt
+```diff
++import androidx.compose.ui.test.assertIsDisplayed
++import androidx.compose.ui.test.junit4.createAndroidComposeRule
++import androidx.compose.ui.test.onNodeWithText
++import org.junit.Rule
++import org.junit.Test
++
++class MainActivityTest {
++
++    @get:Rule
++    val composeTestRule = createAndroidComposeRule<MainActivity>()
++
++    @Test
++    fun displayHelloAndroid() {
++        composeTestRule.setContent {
++            MainScreen()
++        }
++
++        composeTestRule.onNodeWithText("Hello Android!").assertIsDisplayed()
++    }
++
++}
+```
 
