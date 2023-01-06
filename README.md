@@ -30,7 +30,7 @@ Create a new project using the template in Android Studio:
 
 ## Set up CI to run local tests
 
-Create a new Github Actions workflow to run local tests on all modules of the project:
+Create a new Github Actions workflow to run local and Android tests:
 1. In the Android Studio, click **View > Tool Windows > Project**
 2. Select **Project** from drop-down list in the **Project** window on the left side of the Android Studio
 3. Create `.github/workflows` directory in the root of Notes app
@@ -38,54 +38,157 @@ Create a new Github Actions workflow to run local tests on all modules of the pr
 
 📄 .github/workflows/CI.yml
 ```diff
-+name: Run local tests
-+
-+on:
-+  # Trigger the workflow manually using the Actions tab on GitHub, GitHub CLI, or the REST API
-+  workflow_dispatch:
-+  # Trigger the workflow on Push event to main branch
-+  push:
-+    branches: [ main ]
-+  # Trigger the workflow on Pull Request event. By default, a workflow only runs
-+  # when a Pull Request event's activity type is opened, synchronize or reopened.
-+  pull_request:
-+    types: [ opened, synchronize, reopened ]
-+
-+# Cancel any current or previous job from the same Pull Request
-+concurrency:
-+  group: ${{ github.workflow }}-${{ github.ref }}
-+  cancel-in-progress: true
-+
-+jobs:
-+  local-tests:
-+    name: Run Local Tests
-+    runs-on: ubuntu-latest
-+    timeout-minutes: 10
-+    continue-on-error: false
-+
-+    steps:
-+      - name: Checkout repository
-+        uses: actions/checkout@v3
-+
-+      - name: Validate Gradle wrapper
-+        uses: gradle/wrapper-validation-action@v1
-+
-+      - name: Set up JDK 11
-+        uses: actions/setup-java@v3
-+        with:
-+          distribution: 'zulu'
-+          java-version: '11'
-+          cache: 'gradle'
-+
-+      - name: Run local tests
-+        run: ./gradlew testDebug --no-daemon
-+
-+      - name: Upload build reports
-+        if: always()
-+        uses: actions/upload-artifact@v3
-+        with:
-+          name: build-reports
-+          path: ./**/build/reports/tests/
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+
+env:
+  CACHE_VERSION: 1 # Increment this to invalidate the cache.
+  JAVA_VERSION: 11
+
+# Cancel any current or previous job from the same Pull Request
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-tests:
+    name: Check local tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+
+      - name: Run local tests (JVM)
+        run: ./gradlew testDebug --no-daemon
+
+      - name: Upload local tests reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: local-tests-report
+          path: ./**/build/reports/tests/
+
+  android-tests:
+    name: Check android tests
+    runs-on: macOS-latest
+    timeout-minutes: 10
+    continue-on-error: false
+    strategy:
+      fail-fast: true
+      matrix:
+        api-level: [ 31 ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+
+      # API 30+ emulators only have x86_64 system images.
+      - name: Get AVD info
+        uses: ./.github/actions/get-avd-info
+        id: avd-info
+        with:
+          api-level: ${{ matrix.api-level }}
+
+      # Retrieve the cached emulator snapshot.
+      - uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: ${{ runner.os }}-avd-${{ env.CACHE_VERSION }}-${{ steps.avd-info.outputs.arch }}-${{ steps.avd-info.outputs.target }}-${{ matrix.api-level }}
+
+      # Create a new emulator snapshot if it isn't present in the cache.
+      - name: Create AVD snapshot
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ steps.avd-info.outputs.arch }}
+          target: ${{ steps.avd-info.outputs.target }}
+          disable-animations: false
+          force-avd-creation: false
+          ram-size: 4096M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Run android tests (real device or emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ steps.avd-info.outputs.target }}
+          arch: ${{ steps.avd-info.outputs.arch }}
+          disable-animations: true
+          force-avd-creation: false
+          ram-size: 4096M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save
+          script: ./gradlew connectedDebugAndroidTest
+
+      - name: Upload android tests reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-tests-report
+          path: ./**/build/reports/androidTests/
+
+```
+
+5. Create a new file `action.yml` in `.github/actions/get-avd-info` to resolve AVD info for environment constants
+
+📄 .github/actions/get-avd-info/action.yml
+```diff
+name: 'Get AVD Info'
+description: 'Get the AVD info based on its API level.'
+inputs:
+  api-level:
+    required: true
+outputs:
+  arch:
+    value: ${{ steps.get-avd-arch.outputs.arch }}
+  target:
+    value: ${{ steps.get-avd-target.outputs.target }}
+runs:
+  using: "composite"
+  steps:
+    - id: get-avd-arch
+      run: echo "::set-output name=arch::$(if [ ${{ inputs.api-level }} -ge 30 ]; then echo x86_64; else echo x86; fi)"
+      shell: bash
+    - id: get-avd-target
+      run: echo "::set-output name=target::$(echo default)"
+      shell: bash
+
 ```
 
 ## TDD
