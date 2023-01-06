@@ -87,3 +87,57 @@ Create a new Github Actions workflow to run local tests on all modules of the pr
 +          name: build-reports
 +          path: ./**/build/reports/tests/
 ```
+
+## TDD
+
+What is TDD?
+- It's a **software development methodology** in which tests **drive** the development of the application.
+
+Advantages:
+- Great understanding of the product requirements
+- Faster development
+- Better design - high cohesion, low coupling
+- Less defects
+- Promotes quality culture
+- Regression test suite
+- Documentation
+
+The 3 rules of TDD:
+1. You may not write production code until you have written a failing unit test
+2. You may not write more of a unit test than is sufficient to fail, and not compiling is failing
+3. You may not write more production code than is sufficient to pass the currently failing test
+
+Types of TDD:
+1. Inside-out (Detroit school, Classicist, state based testing, black-box-testing)
+- Kent Beck, Uncle Bob, Ron Jeffries
+- No use of Mocks
+- Tests only the end results (state)
+- Emerging Design
+
+Pros
+- Faster refactoring
+
+Cons
+- Can be hard to identify what the issue is
+- Redundant coverage
+
+2. Outside-in (London school, Mockist, interaction testing, white-box-testing)
+- Steve Freeman, Sandi Metz, J.B. Rainsberger
+- Vast use of Mocks
+- Testing the interactions
+- Upfront Design
+
+Pros
+- easier to track down issues
+- Upfront Design
+- Enforces Architectural Design
+
+Cons
+- Refactoring the classes public API will require extra work on tests
+- Might produce false positives
+
+Which TDD style is best for us?
+- The true value of tests is tracking down and correcting defects
+- Outside-in starting with failing Acceptance Test, resolved with multiple Red > Green > Refactor cycles
+
+
