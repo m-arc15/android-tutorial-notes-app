@@ -26,8 +26,8 @@ Feature: Capture and organize notes
 /**
  * Large End-to-End tests for the notes feature.
  */
-@RunWith(AndroidJUnit4::class)
-@LargeTest
-class NotesFeatureTests {
-
-}
+//@RunWith(AndroidJUnit4::class)
+//@LargeTest
+//class NotesFeatureTests {
+//
+//}
