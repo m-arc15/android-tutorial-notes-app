@@ -6,6 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.artishevsky.notes.core.ui.MainActivity
 import com.artishevsky.notes.features.note.presentation.notes.NotesScreenRobot
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,9 +45,13 @@ Feature: Capture and organize notes
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
+@HiltAndroidTest
 class NotesFeatureTests {
 
-    @get:Rule
+    @get:Rule(order = 1)
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 2)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Before
