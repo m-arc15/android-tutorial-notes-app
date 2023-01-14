@@ -1,4 +1,4 @@
-package com.artishevsky.notes.features.notes.domain
+package com.artishevsky.notes.features.note.domain
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import com.artishevsky.notes.ui.theme.NotesTheme
+import com.artishevsky.notes.core.ui.theme.NotesTheme
 
 @Composable
 fun NotesScreen() {

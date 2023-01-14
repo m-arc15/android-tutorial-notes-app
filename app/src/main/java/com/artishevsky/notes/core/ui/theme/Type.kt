@@ -1,4 +1,4 @@
-package com.artishevsky.notes.ui.theme
+package com.artishevsky.notes.core.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

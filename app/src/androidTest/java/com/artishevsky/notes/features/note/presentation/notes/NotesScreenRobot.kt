@@ -1,4 +1,4 @@
-package com.artishevsky.notes.features.notes.domain
+package com.artishevsky.notes.features.note.presentation.notes
 
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -6,7 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.artishevsky.notes.MainActivity
+import com.artishevsky.notes.core.ui.MainActivity
 
 class NotesScreenRobot constructor(
     private val composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>

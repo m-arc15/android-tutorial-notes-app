@@ -1,11 +1,11 @@
-package com.artishevsky.notes.features.notes
+package com.artishevsky.notes.features.note
 
 import android.util.Log
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.artishevsky.notes.MainActivity
-import com.artishevsky.notes.features.notes.domain.NotesScreenRobot
+import com.artishevsky.notes.core.ui.MainActivity
+import com.artishevsky.notes.features.note.presentation.notes.NotesScreenRobot
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
