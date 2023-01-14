@@ -1,7 +1,10 @@
 package com.artishevsky.notes.features.notes
 
+import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 
 /*
@@ -20,14 +23,41 @@ Feature: Capture and organize notes
     - [ ] I will be prompted if I try to leave note editing without save
 
     Scenario 1:
+        Given the app is installed
+        When I launch the Notes app
+        Then the notes screen is displayed on home screen
 
  */
 
 /**
  * Large End-to-End tests for the notes feature.
  */
-//@RunWith(AndroidJUnit4::class)
-//@LargeTest
-//class NotesFeatureTests {
-//
-//}
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class NotesFeatureTests {
+
+    @Before
+    fun setUpTestCase() {
+        currentTestStep = 0
+    }
+
+    @Test
+    fun testLaunchingAppStartsWithNotesScreen() {
+        step("Given the app is installed")
+        TODO()
+
+        step("When I launch the Notes app")
+        TODO()
+
+        step("Then the notes screen is displayed on home screen")
+        TODO()
+    }
+
+}
+
+// region Test Steps Logging
+private const val TAG = "NotesFeatureTests"
+private var currentTestStep: Int = 0
+private val logTestStep: () -> String = { "[STEP %02d]".format(currentTestStep++) }
+private val step: (String) -> Unit = { Log.d(TAG, "${logTestStep()} $it") }
+// endregion
