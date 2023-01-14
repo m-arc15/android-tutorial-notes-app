@@ -44,13 +44,13 @@ class NotesFeatureTests {
     @Test
     fun testLaunchingAppStartsWithNotesScreen() {
         step("Given the app is installed")
-        TODO()
+        /* no-op required */
 
         step("When I launch the Notes app")
-        TODO()
+        /* no-op required */
 
         step("Then the notes screen is displayed on home screen")
-        TODO()
+        NotesScreenRobot(composeTestRule).assertScreenTitleDisplayed()
     }
 
 }
