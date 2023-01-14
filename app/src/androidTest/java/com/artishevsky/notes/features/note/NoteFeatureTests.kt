@@ -31,6 +31,11 @@ Feature: Capture and organize notes
         When I launch the Notes app
         Then the notes screen is displayed on home screen
 
+    Scenario 2: testSavedNotesAreDisplayed
+        Given my notes are stored in local database
+        When I launch the Notes app
+        Then I will see my notes saved in local database
+
  */
 
 /**
@@ -58,6 +63,16 @@ class NotesFeatureTests {
 
         step("Then the notes screen is displayed on home screen")
         NotesScreenRobot(composeTestRule).assertScreenTitleIsDisplayed()
+    }
+
+    @Test
+    fun testSavedNotesAreDisplayed() {
+        step("Given my notes are stored in local database")
+        TODO()
+        step("When I launch the Notes app")
+        TODO()
+        step("Then I will see my notes saved in local database")
+        TODO()
     }
 
 }
