@@ -26,7 +26,7 @@ Feature: Capture and organize notes
     - [ ] I can see 'No notes found' empty screen when no available notes
     - [ ] I will be prompted if I try to leave note editing without save
 
-    Scenario 1:
+    Scenario 1: testLaunchingAppStartsWithNotesScreen
         Given the app is installed
         When I launch the Notes app
         Then the notes screen is displayed on home screen
