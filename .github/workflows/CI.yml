@@ -20,8 +20,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  local-tests:
-    name: Check local tests
+  test-local:
+    name: LOCAL TESTS
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: false
@@ -40,7 +40,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
 
-      - name: Run local tests (JVM)
+      - name: Run local tests (on JVM)
         run: ./gradlew testDebug --no-daemon
 
       - name: Upload local tests reports
@@ -50,8 +50,8 @@ jobs:
           name: local-tests-report
           path: ./**/build/reports/tests/
 
-  android-tests:
-    name: Check android tests
+  test-device:
+    name: DEVICE TESTS
     runs-on: macOS-latest
     timeout-minutes: 10
     continue-on-error: false
@@ -104,7 +104,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Run android tests (real device or emulator)
+      - name: Run device tests (on a real device or on an emulator)
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -116,9 +116,9 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save
           script: ./gradlew connectedDebugAndroidTest
 
-      - name: Upload android tests reports
+      - name: Upload device tests reports
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: android-tests-report
+          name: device-tests-report
           path: ./**/build/reports/androidTests/
