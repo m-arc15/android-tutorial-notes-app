@@ -1,9 +1,13 @@
 package com.artishevsky.notes.features.notes
 
 import android.util.Log
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.artishevsky.notes.MainActivity
+import com.artishevsky.notes.features.notes.domain.NotesScreenRobot
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -36,6 +40,9 @@ Feature: Capture and organize notes
 @LargeTest
 class NotesFeatureTests {
 
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
     @Before
     fun setUpTestCase() {
         currentTestStep = 0
@@ -50,7 +57,7 @@ class NotesFeatureTests {
         /* no-op required */
 
         step("Then the notes screen is displayed on home screen")
-        NotesScreenRobot(composeTestRule).assertScreenTitleDisplayed()
+        NotesScreenRobot(composeTestRule).assertScreenTitleIsDisplayed()
     }
 
 }
