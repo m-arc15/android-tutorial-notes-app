@@ -4,6 +4,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.artishevsky.notes.core.ui.MainActivity
+import com.artishevsky.notes.feature.note.domain.model.Note
 
 class NotesScreenRobot constructor(
     private val composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
@@ -18,6 +19,10 @@ class NotesScreenRobot constructor(
 
     private val sortOptionsButton by lazy {
         composeTestRule.onNodeWithContentDescription("Sort")
+    }
+
+    private val notesList by lazy {
+        composeTestRule.onNode(hasTestTag("Notes list"))
     }
 
     fun assertScreenTitleIsDisplayed() {
@@ -37,5 +42,17 @@ class NotesScreenRobot constructor(
         sortOptionsButton
             .assertIsDisplayed()
             .assertHasClickAction()
+    }
+
+    fun assertNotesListIsDisplayed() {
+        notesList
+            .assertIsDisplayed()
+            .assertHasNoClickAction()
+    }
+
+    fun assertNotesAreDisplayed(notes: List<Note>) {
+        notes.forEach {
+            notesList.performScrollToNode(hasText(it.title))
+        }
     }
 }
