@@ -11,7 +11,7 @@ on:
       - 'README.md'
 
 env:
-  CACHE_VERSION: 1 # Increment this to invalidate the cache.
+  CACHE_VERSION: 2 # Increment this to invalidate the cache.
   JAVA_VERSION: 11
 
 # Cancel any current or previous job from the same Pull Request
@@ -53,7 +53,7 @@ jobs:
   test-device:
     name: DEVICE TESTS
     runs-on: macOS-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     continue-on-error: false
     strategy:
       fail-fast: true
@@ -114,7 +114,7 @@ jobs:
           force-avd-creation: false
           ram-size: 4096M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save
-          script: ./gradlew connectedDebugAndroidTest
+          script: ./gradlew connectedDebugAndroidTest -Dorg.gradle.jvmargs="-Xmx2g -Xms2g -XX:ThreadStackSize=4096 -XX:CompilerThreadStackSize=4096"
 
       - name: Upload device tests reports
         if: always()
