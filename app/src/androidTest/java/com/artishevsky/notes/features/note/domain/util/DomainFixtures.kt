@@ -31,7 +31,7 @@ object DomainFixtures {
             "Single source of truth" to "When a new data type is defined in your app, you should assign a Single Source of Truth (SSOT) to it. The SSOT is the owner of that data, and only the SSOT can modify or mutate it. To achieve this, the SSOT exposes the data using an immutable type, and to modify the data, the SSOT exposes functions or receive events that other types can call.",
         )
 
-        return (1..n).map { i ->
+        return (0 until n).map { i ->
             Note(
                 id = i,
                 title = data.keys.elementAt(i % data.size),

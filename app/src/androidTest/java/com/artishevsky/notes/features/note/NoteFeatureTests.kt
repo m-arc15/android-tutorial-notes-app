@@ -5,14 +5,20 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.artishevsky.notes.core.ui.MainActivity
+import com.artishevsky.notes.feature.note.data.data_source.NoteDatabase
+import com.artishevsky.notes.feature.note.domain.repository.NoteRepository
+import com.artishevsky.notes.features.note.domain.util.DomainFixtures
 import com.artishevsky.notes.features.note.presentation.notes.NotesScreenRobot
 import com.artishevsky.notes.features.note.presentation.notes.notesScreenRobot
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /*
 Feature: Capture and organize notes
@@ -21,7 +27,7 @@ Feature: Capture and organize notes
     So that I can find them later when needed
 
     Acceptance Criteria
-    - [ ] I will see my available notes saved in local database
+    - [x] I will see my available notes saved in local database
     - [ ] I can quickly capture a new note with title, description and pre-defined color
     - [ ] I can remove selected note and undo this operation
     - [ ] I can edit saved note
@@ -55,11 +61,22 @@ class NotesFeatureTests {
     @get:Rule(order = 2)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Inject
+    lateinit var repository: NoteRepository
+
+    @Inject
+    lateinit var database: NoteDatabase
+
     @Before
-    fun init() {
+    fun setUp() {
         currentTestStep = 0
 
         hiltRule.inject()
+    }
+
+    @After
+    fun tearDown() {
+        database.close()
     }
 
     @Test
@@ -75,13 +92,16 @@ class NotesFeatureTests {
     }
 
     @Test
-    fun testSavedNotesAreDisplayed() {
+    fun testSavedNotesAreDisplayed() = runTest {
         step("Given my notes are stored in local database")
-        TODO()
+        val notes = DomainFixtures.getNotes(5)
+        repository.insertNotes(notes)
+
         step("When I launch the Notes app")
-        TODO()
+        /* no-op required */
+
         step("Then I will see my notes saved in local database")
-        TODO()
+        onNotesScreen { assertNotesAreDisplayed(notes) }
     }
 
     private fun onNotesScreen(func: NotesScreenRobot<MainActivity>.() -> Unit) {
