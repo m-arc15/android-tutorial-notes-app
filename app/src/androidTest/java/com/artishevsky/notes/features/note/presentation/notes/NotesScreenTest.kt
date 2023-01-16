@@ -1,86 +1,83 @@
 package com.artishevsky.notes.features.note.presentation.notes
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.artishevsky.notes.core.di.RepositoryModule
-import com.artishevsky.notes.core.ui.MainActivity
-import com.artishevsky.notes.feature.note.domain.repository.NoteRepository
+import com.artishevsky.notes.feature.note.domain.use_case.NoteUseCases
 import com.artishevsky.notes.feature.note.presentation.NotesScreen
-import com.artishevsky.notes.features.note.data.repository.NoteRepositoryFake
+import com.artishevsky.notes.feature.note.presentation.NotesViewModel
 import com.artishevsky.notes.features.note.domain.util.DomainFixtures
-import dagger.hilt.android.testing.BindValue
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.UninstallModules
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Medium Integration tests for the notes screen.
+ * Medium Integration tests for the notes screen with view model.
+ * Testing in isolation with ComponentActivity.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@HiltAndroidTest
-@UninstallModules(RepositoryModule::class)
 class NotesScreenTest {
 
-    @get:Rule(order = 0)
-    var hiltRule = HiltAndroidRule(this)
-
     @get:Rule(order = 1)
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val fakeRepository = NoteRepositoryFake()
-
-    @BindValue
-    @JvmField
-    val repository: NoteRepository = fakeRepository
+    private val mockUseCases: NoteUseCases = mockk(relaxed = true)
 
     @Test
     fun testScreenTitleIsDisplayed() {
         launchNotesScreen()
-        NotesScreenRobot(composeTestRule).assertScreenTitleIsDisplayed()
+        onNotesScreen { assertScreenTitleIsDisplayed() }
     }
 
     @Test
     fun testAddNoteButtonIsDisplayed() {
         launchNotesScreen()
-        NotesScreenRobot(composeTestRule).assertAddNoteButtonIsDisplayed()
+        onNotesScreen { assertAddNoteButtonIsDisplayed() }
     }
 
     @Test
     fun testSortButtonIsDisplayed() {
         launchNotesScreen()
-        NotesScreenRobot(composeTestRule).assertSortOptionsButtonIsDisplayed()
+        onNotesScreen { assertSortOptionsButtonIsDisplayed() }
     }
 
     @Test
     fun testNotesListIsDisplayed() = runTest {
-        fakeRepository.emit(DomainFixtures.getNotes(0))
-
         launchNotesScreen()
 
-        NotesScreenRobot(composeTestRule).assertNotesListIsDisplayed()
+        onNotesScreen { assertNotesListIsDisplayed() }
     }
 
     @Test
     fun testNotesListItemsAreDisplayed() = runTest {
         val notes = DomainFixtures.getNotes(6)
-        fakeRepository.emit(notes)
+        coEvery { mockUseCases.getNotes() } returns flowOf(notes)
 
         launchNotesScreen()
 
-        NotesScreenRobot(composeTestRule).assertNotesAreDisplayed(notes)
+        onNotesScreen { assertNotesAreDisplayed(notes) }
     }
 
     private fun launchNotesScreen() {
         composeTestRule.setContent {
-            NotesScreen()
+            NotesScreen(
+                viewModel = NotesViewModel(
+                    noteUseCases = mockUseCases
+                )
+            )
         }
     }
+
+    private fun onNotesScreen(func: NotesScreenRobot<ComponentActivity>.() -> Unit) {
+        notesScreenRobot(composeTestRule, func)
+    }
+
 }

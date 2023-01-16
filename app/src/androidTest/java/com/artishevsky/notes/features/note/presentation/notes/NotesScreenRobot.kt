@@ -1,13 +1,13 @@
 package com.artishevsky.notes.features.note.presentation.notes
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.artishevsky.notes.core.ui.MainActivity
 import com.artishevsky.notes.feature.note.domain.model.Note
 
-class NotesScreenRobot constructor(
-    private val composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
+class NotesScreenRobot<T : ComponentActivity> constructor(
+    private val composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<T>, T>
 ) {
     private val screenTitle by lazy {
         composeTestRule.onNodeWithContentDescription("Your notes")
@@ -56,3 +56,8 @@ class NotesScreenRobot constructor(
         }
     }
 }
+
+fun <T : ComponentActivity> notesScreenRobot(
+    composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<T>, T>,
+    func: NotesScreenRobot<T>.() -> Unit
+): NotesScreenRobot<T> = NotesScreenRobot(composeTestRule).apply { func() }

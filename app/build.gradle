@@ -56,6 +56,11 @@ android {
             }
         }
     }
+    packagingOptions {
+        resources {
+            excludes += ["META-INF/*"]
+        }
+    }
 }
 
 dependencies {
@@ -80,6 +85,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
 
     testImplementation "io.mockk:mockk:1.13.3"
+    androidTestImplementation "io.mockk:mockk-android:1.13.3"
     testImplementation 'app.cash.turbine:turbine:0.12.1'
 
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"

@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.artishevsky.notes.core.ui.MainActivity
 import com.artishevsky.notes.features.note.presentation.notes.NotesScreenRobot
+import com.artishevsky.notes.features.note.presentation.notes.notesScreenRobot
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -55,8 +56,10 @@ class NotesFeatureTests {
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Before
-    fun setUpTestCase() {
+    fun init() {
         currentTestStep = 0
+
+        hiltRule.inject()
     }
 
     @Test
@@ -68,7 +71,7 @@ class NotesFeatureTests {
         /* no-op required */
 
         step("Then the notes screen is displayed on home screen")
-        NotesScreenRobot(composeTestRule).assertScreenTitleIsDisplayed()
+        onNotesScreen { assertScreenTitleIsDisplayed() }
     }
 
     @Test
@@ -79,6 +82,10 @@ class NotesFeatureTests {
         TODO()
         step("Then I will see my notes saved in local database")
         TODO()
+    }
+
+    private fun onNotesScreen(func: NotesScreenRobot<MainActivity>.() -> Unit) {
+        notesScreenRobot(composeTestRule, func)
     }
 
 }
