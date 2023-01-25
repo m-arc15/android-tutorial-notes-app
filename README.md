@@ -2,15 +2,25 @@
 
 This tutorial will walk you through the process of building a simple notes app with Android
 
+## Prerequisites
+
+- [Test Desiderata](https://kentbeck.github.io/TestDesiderata/)
+- [Don't do E2E testing](https://youtu.be/QFCHSEHgqFE)
+
 ## Getting started
 
-Make sure to complete [Android Studio installation](https://developer.android.com/studio/install). If you need more detailed instructions on the setup process, refer to the [Download and install Android Studio](https://developer.android.com/codelabs/basic-android-kotlin-training-install-android-studio) codelab.
+Make sure to complete [Android Studio installation](https://developer.android.com/studio/install).
+If you need more detailed instructions on the setup process, refer to
+the [Download and install Android Studio](https://developer.android.com/codelabs/basic-android-kotlin-training-install-android-studio)
+codelab.
 
 ## First steps
 
 Create a new project using the template in Android Studio:
+
 1. Double click the Android Studio icon to launch Android Studio.
-2. In the **Welcome to Android Studio** dialog, click **New Project**. The **New Project** window opens with a list of templates provided by Android Studio.
+2. In the **Welcome to Android Studio** dialog, click **New Project**. The **New Project** window
+   opens with a list of templates provided by Android Studio.
 3. Make sure the **Phone and Tablet** tab is selected.
 4. Click the **Empty Compose Activity (Material3)** template to select it as the template for your project. The **Empty Compose Activity template** is the template to create a simple project that you can use to build a Compose app. It has a single screen and displays the text `"Hello Android!"`.
 5. Click **Next**. The **New Project** dialog opens. This has some fields to configure your project.
